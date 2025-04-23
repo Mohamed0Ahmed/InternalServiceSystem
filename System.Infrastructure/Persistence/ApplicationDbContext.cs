@@ -20,7 +20,9 @@ namespace System.Infrastructure.Persistence
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<HelpRequest> HelpRequests { get; set; }
         public DbSet<PointsSetting> PointsSettings { get; set; }
-        public DbSet<GuestPoints> GuestPoints { get; set; }
+        public DbSet<CustomerPoints> CustomerPoints { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Reward> Rewards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

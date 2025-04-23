@@ -11,13 +11,15 @@ namespace System.Infrastructure.Persistence.Configurations
             base.Configure(builder);
 
             builder.Property(r => r.RoomName)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
 
             builder.HasOne(r => r.Branch)
                 .WithMany()
                 .HasForeignKey(r => r.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(r => new { r.BranchId, r.RoomName })
+                .IsUnique();
         }
     }
 }

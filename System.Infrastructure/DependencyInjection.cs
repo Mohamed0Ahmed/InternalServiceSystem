@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Application.Abstraction;
 using System.Infrastructure.Persistence;
-using System.Infrastructure.UnitOfWorks;
 
 namespace System.Infrastructure
 {
@@ -15,7 +12,6 @@ namespace System.Infrastructure
 
        
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("AppContext")));

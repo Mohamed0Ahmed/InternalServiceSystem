@@ -7,6 +7,7 @@ namespace System.Domain.Entities
         public int StoreId { get; set; }
         public int BranchId { get; set; }
         public int RoomId { get; set; }
+        public required string PhoneNumber { get; set; } 
         public required Store Store { get; set; }
         public Branch? Branch { get; set; }
         public required Room Room { get; set; }

@@ -10,17 +10,10 @@ namespace System.Infrastructure.Persistence.Configurations
         {
             builder.HasKey(e => e.Id);
 
-            if (typeof(TID) == typeof(string))
-            {
-                builder.Property(e => e.Id)
-                    .IsRequired()
-                    .HasMaxLength(20);
-            }
-            else
-            {
-                builder.Property(e => e.Id)
-                    .IsRequired();
-            }
+
+            builder.Property(e => e.Id)
+                .IsRequired();
+           
 
             builder.Property(e => e.IsDeleted)
                 .IsRequired()
@@ -35,16 +28,14 @@ namespace System.Infrastructure.Persistence.Configurations
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(e => e.CreatedBy)
-                .IsRequired(false)
-                .HasMaxLength(50);
+                .IsRequired(false);
 
             builder.Property(e => e.LastModifiedOn)
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(e => e.LastModifiedBy)
-                .IsRequired(false)
-                .HasMaxLength(50);
+                .IsRequired(false);
 
             builder.Property(e => e.DeletedOn)
                 .IsRequired(false);

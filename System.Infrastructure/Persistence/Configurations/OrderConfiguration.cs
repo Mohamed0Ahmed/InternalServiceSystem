@@ -10,17 +10,21 @@ namespace System.Infrastructure.Persistence.Configurations
         {
             base.Configure(builder);
 
-            builder.Property(o => o.PhoneNumber)
+            builder.Property(o => o.TotalPriceAtOrderTime)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasColumnType("decimal(18,2)");
 
             builder.Property(o => o.Status)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
+
+            builder.HasOne(o => o.Customer)
+                .WithMany()
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.Guest)
                 .WithMany()
-                .HasForeignKey(o => o.PhoneNumber)
+                .HasForeignKey(o => o.GuestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.Room)

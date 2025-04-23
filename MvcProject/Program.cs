@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using System.Application.Abstraction;
 using System.Infrastructure;
+using System.Application;
 using System.Infrastructure.Persistence;
+using System.Infrastructure.UnitOfWorks;
 
 namespace MvcProject
 {
@@ -12,9 +15,11 @@ namespace MvcProject
 
 
             #region Services
-
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddApplicationServices(builder.Configuration);
+
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {

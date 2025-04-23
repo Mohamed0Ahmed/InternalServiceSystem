@@ -10,24 +10,22 @@ namespace System.Infrastructure.Persistence.Configurations
         {
             base.Configure(builder);
 
-            builder.Property(hr => hr.PhoneNumber)
-                .IsRequired()
-                .HasMaxLength(20);
-
             builder.Property(hr => hr.RequestType)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
 
-            builder.Property(hr => hr.Details)
-                .HasMaxLength(500);
+            builder.Property(hr => hr.Details);
 
             builder.Property(hr => hr.Status)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
+
+            builder.HasOne(hr => hr.Customer)
+                .WithMany()
+                .HasForeignKey(hr => hr.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(hr => hr.Guest)
                 .WithMany()
-                .HasForeignKey(hr => hr.PhoneNumber)
+                .HasForeignKey(hr => hr.GuestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(hr => hr.Room)

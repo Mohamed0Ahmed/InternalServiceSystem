@@ -35,6 +35,18 @@ namespace System.Infrastructure.GenericRepositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> FindAllAsync(params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query
+                .Where(e => !e.IsDeleted)
+                .ToListAsync();
+        }
+
         public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
@@ -47,9 +59,28 @@ namespace System.Infrastructure.GenericRepositories
                 .FirstOrDefaultAsync(predicate);
         }
 
-        public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query
+                .Where(e => !e.IsDeleted)
+                .Where(predicate)
+                .ToListAsync();
+        }
 
-        public void Update(T entity) => _dbSet.Update(entity);
+        public async Task AddAsync(T entity)
+        {
+            await _dbSet.AddAsync(entity);
+        }
+
+        public void Update(T entity)
+        {
+            _dbSet.Update(entity);
+        }
 
         public void Delete(T entity)
         {
@@ -58,7 +89,24 @@ namespace System.Infrastructure.GenericRepositories
             _dbSet.Update(entity);
         }
 
-        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate) =>
-            await _dbSet.AnyAsync(predicate);
+        public async Task SoftDeleteAsync(TKey id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new InvalidOperationException($"Entity with ID {id} not found.");
+            }
+            Delete(entity);
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.CountAsync(predicate);
+        }
     }
 }

@@ -10,8 +10,7 @@ namespace System.Infrastructure.Persistence.Configurations
             base.Configure(builder);
 
             builder.Property(s => s.StoreName)
-                .IsRequired()
-                .HasMaxLength(100);
+                .IsRequired();
         }
     }
 }

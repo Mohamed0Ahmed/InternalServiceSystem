@@ -11,8 +11,7 @@ namespace System.Infrastructure.Persistence.Configurations
             base.Configure(builder);
 
             builder.Property(p => p.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+                .IsRequired();
 
             builder.Property(p => p.Price)
                 .HasColumnType("decimal(18,2)");

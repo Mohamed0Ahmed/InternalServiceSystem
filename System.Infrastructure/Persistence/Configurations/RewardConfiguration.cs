@@ -4,18 +4,21 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class BranchConfiguration : BaseEntityConfiguration<Branch, int>
+    public class RewardConfiguration : BaseEntityConfiguration<Reward, int>
     {
-        public override void Configure(EntityTypeBuilder<Branch> builder)
+        public override void Configure(EntityTypeBuilder<Reward> builder)
         {
             base.Configure(builder);
 
-            builder.Property(b => b.BranchName)
+            builder.Property(r => r.Name)
                 .IsRequired();
 
-            builder.HasOne(b => b.Store)
+            builder.Property(r => r.RequiredPoints)
+                .IsRequired();
+
+            builder.HasOne(r => r.Branch)
                 .WithMany()
-                .HasForeignKey(b => b.StoreId)
+                .HasForeignKey(r => r.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

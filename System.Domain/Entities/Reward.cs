@@ -2,11 +2,11 @@
 
 namespace System.Domain.Entities
 {
-    public class PointsSetting : BaseEntity<int>
+    public class Reward : BaseEntity<int>
     {
         public int BranchId { get; set; }
-        public decimal AmountPerPoint { get; set; }
-        public int PointsValue { get; set; }
+        public required string Name { get; set; }
+        public int RequiredPoints { get; set; }
         public required Branch Branch { get; set; }
     }
 }
