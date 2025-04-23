@@ -13,26 +13,55 @@ namespace System.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Product>> GetProductsByBranchAsync(int branchId)
+        public async Task<Product> GetByIdAsync(int id)
         {
-            return await _unitOfWork.Repository<Product, int>()
-                .FindAsync(p => p.BranchId == branchId && p.IsVisible);
+            return await _unitOfWork.Repository<Product,int>().GetByIdAsync(id);
         }
 
-        public async Task<Product> CreateProductAsync(int branchId, string name, decimal price, bool isVisible)
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            var product = new Product
+            return await _unitOfWork.Repository<Product, int>().GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetByBranchIdAsync(int branchId)
+        {
+            return await _unitOfWork.Repository<Product, int>().FindAsync(p => p.BranchId == branchId);
+        }
+
+        public async Task AddAsync(Product product)
+        {
+            var branch = await _unitOfWork.Repository<Branch, int>().GetByIdAsync(product.BranchId);
+            if (branch == null)
             {
-                BranchId = branchId,
-                Name = name,
-                Price = price,
-                IsVisible = isVisible
-            };
+                throw new InvalidOperationException($"Branch with ID {product.BranchId} not found.");
+            }
 
             await _unitOfWork.Repository<Product, int>().AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
+        }
 
-            return product;
+        public async Task UpdateAsync(Product product)
+        {
+            var branch = await _unitOfWork.Repository<Branch, int>().GetByIdAsync(product.BranchId);
+            if (branch == null)
+            {
+                throw new InvalidOperationException($"Branch with ID {product.BranchId} not found.");
+            }
+
+            _unitOfWork.Repository<Product, int>().Update(product);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var product = await _unitOfWork.Repository<Product, int>().GetByIdAsync(id);
+            if (product == null)
+            {
+                throw new InvalidOperationException($"Product with ID {id} not found.");
+            }
+
+            _unitOfWork.Repository<Product, int>().Delete(product);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

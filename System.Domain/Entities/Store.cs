@@ -4,6 +4,6 @@ namespace System.Domain.Entities
 {
     public class Store : BaseEntity<int>
     {
-        public required string  StoreName { get; set; }
+        public string StoreName { get; set; } = string.Empty;
     }
 }

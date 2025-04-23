@@ -5,7 +5,7 @@ namespace System.Domain.Entities
     public class Branch : BaseEntity<int>
     {
         public int StoreId { get; set; }
-        public required string BranchName { get; set; }
-        public required Store Store { get; set; }
+        public  string BranchName { get; set; } = string.Empty;
+        public  Store Store { get; set; }
     }
 }

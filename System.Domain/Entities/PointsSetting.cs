@@ -7,6 +7,6 @@ namespace System.Domain.Entities
         public int BranchId { get; set; }
         public decimal AmountPerPoint { get; set; }
         public int PointsValue { get; set; }
-        public required Branch Branch { get; set; }
+        public  Branch Branch { get; set; }
     }
 }
