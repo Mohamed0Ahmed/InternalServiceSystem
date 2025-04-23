@@ -4,12 +4,10 @@ namespace System.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<Order> GetByIdAsync(int id);
-        Task<IEnumerable<Order>> GetAllAsync();
-        Task<IEnumerable<Order>> GetByGuestIdAsync(string guestId);
-        Task AddAsync(Order order, IEnumerable<OrderItem> orderItems);
-        Task UpdateAsync(Order order);
-        Task DeleteAsync(int id);
-        Task<decimal> CalculateTotalPriceAsync(IEnumerable<OrderItem> orderItems);
+        Task<Order> CreateOrderAsync(int customerId, string guestId, int roomId, List<(int ProductId, int Quantity)> orderItems);
+        Task<IEnumerable<Order>> GetPendingOrdersAsync();
+        Task ConfirmOrderAsync(int orderId);
+        Task CancelOrderAsync(int orderId);
+        Task<IEnumerable<Order>> GetOrdersByCustomerAsync(int customerId);
     }
 }

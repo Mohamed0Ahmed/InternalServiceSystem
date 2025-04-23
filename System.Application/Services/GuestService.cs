@@ -13,79 +13,38 @@ namespace System.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Guest> GetByIdAsync(string id)
+        public async Task<Guest> AuthenticateAsync(string username, string password, string storeName)
         {
-            return await _unitOfWork.Repository<Guest,string>().GetByIdAsync(id);
-        }
+            var store = await _unitOfWork.Repository<Store, int>()
+                .GetAsync(s => s.StoreName == storeName);
 
-        public async Task<IEnumerable<Guest>> GetAllAsync()
-        {
-            return await _unitOfWork.Repository<Guest,string>().GetAllAsync();
-        }
-
-        public async Task<IEnumerable<Guest>> GetByBranchIdAsync(int branchId)
-        {
-            return await _unitOfWork.Repository<Guest, string>().FindAsync(g => g.BranchId == branchId);
-        }
-
-        public async Task AddAsync(Guest guest)
-        {
-            var store = await _unitOfWork.Repository<Room, int>().GetByIdAsync(guest.StoreId);
             if (store == null)
             {
-                throw new InvalidOperationException($"Store with ID {guest.StoreId} not found.");
+                throw new Exception("Store not found.");
             }
 
-            var branch = await _unitOfWork.Repository<Branch, int>().GetByIdAsync(guest.BranchId);
-            if (branch == null)
-            {
-                throw new InvalidOperationException($"Branch with ID {guest.BranchId} not found.");
-            }
+            var guest = await _unitOfWork.Repository<Guest, string>()
+                .GetAsync(g => g.Username == username && g.Password == password && g.StoreId == store.Id);
 
-            var room = await _unitOfWork.Repository<Room, int>().GetByIdAsync(guest.RoomId);
-            if (room == null)
-            {
-                throw new InvalidOperationException($"Room with ID {guest.RoomId} not found.");
-            }
-
-            await _unitOfWork.Repository<Guest, string>().AddAsync(guest);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Guest guest)
-        {
-            var store = await _unitOfWork.Repository<Store, int>().GetByIdAsync(guest.StoreId);
-            if (store == null)
-            {
-                throw new InvalidOperationException($"Store with ID {guest.StoreId} not found.");
-            }
-
-            var branch = await _unitOfWork.Repository<Branch, int>().GetByIdAsync(guest.BranchId);
-            if (branch == null)
-            {
-                throw new InvalidOperationException($"Branch with ID {guest.BranchId} not found.");
-            }
-
-            var room = await _unitOfWork.Repository<Room, int>().GetByIdAsync(guest.RoomId);
-            if (room == null)
-            {
-                throw new InvalidOperationException($"Room with ID {guest.RoomId} not found.");
-            }
-
-            _unitOfWork.Repository<Guest, string>().Update(guest);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(string id)
-        {
-            var guest = await _unitOfWork.Repository<Guest, string>().GetByIdAsync(id);
             if (guest == null)
             {
-                throw new InvalidOperationException($"Guest with ID {id} not found.");
+                throw new Exception("Invalid username or password.");
             }
 
-            _unitOfWork.Repository<Guest, string>().Delete(guest);
-            await _unitOfWork.SaveChangesAsync();
+            return guest;
+        }
+
+        public async Task<Guest> GetGuestByIdAsync(string guestId)
+        {
+            var guest = await _unitOfWork.Repository<Guest, string>()
+                .GetAsync(g => g.Id == guestId);
+
+            if (guest == null)
+            {
+                throw new Exception("Guest not found.");
+            }
+
+            return guest;
         }
     }
 }

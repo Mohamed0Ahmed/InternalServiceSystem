@@ -4,11 +4,7 @@ namespace System.Application.Interfaces
 {
     public interface IGuestService
     {
-        Task<Guest> GetByIdAsync(string id);
-        Task<IEnumerable<Guest>> GetAllAsync();
-        Task<IEnumerable<Guest>> GetByBranchIdAsync(int branchId);
-        Task AddAsync(Guest guest);
-        Task UpdateAsync(Guest guest);
-        Task DeleteAsync(string id);
+        Task<Guest> AuthenticateAsync(string username, string password, string storeName);
+        Task<Guest> GetGuestByIdAsync(string guestId);
     }
 }

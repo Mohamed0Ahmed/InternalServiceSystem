@@ -2,7 +2,7 @@
 {
     public abstract class BaseEntity<TKey> where TKey : IEquatable<TKey>
     {
-        public required TKey Id { get; set; }
+        public  TKey Id { get; set; } 
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedOn { get; set; }
         public bool IsHidden { get; set; } = false;

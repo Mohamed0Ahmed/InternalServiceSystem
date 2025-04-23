@@ -13,54 +13,58 @@ namespace System.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<HelpRequest> GetByIdAsync(int id)
+        public async Task<HelpRequest> CreateHelpRequestAsync(int customerId, string guestId, int roomId, string requestType, string details)
         {
-            return await _unitOfWork.Repository<HelpRequest,int>().GetByIdAsync(id);
-        }
-
-        public async Task<IEnumerable<HelpRequest>> GetAllAsync()
-        {
-            return await _unitOfWork.Repository<HelpRequest,int>().GetAllAsync();
-        }
-
-        public async Task<IEnumerable<HelpRequest>> GetByGuestIdAsync(string guestId)
-        {
-            return await _unitOfWork.Repository<HelpRequest, int>().FindAsync(hr => hr.PhoneNumber == guestId);
-        }
-
-        public async Task AddAsync(HelpRequest helpRequest)
-        {
-            var guest = await _unitOfWork.Repository<Guest, string>().GetByIdAsync(helpRequest.PhoneNumber);
-            if (guest == null)
+            var helpRequest = new HelpRequest
             {
-                throw new InvalidOperationException($"Guest with ID {helpRequest.PhoneNumber} not found.");
-            }
+                CustomerId = customerId,
+                GuestId = guestId,
+                RoomId = roomId,
+                RequestType = requestType,
+                Details = details,
+                RequestDate = DateTime.UtcNow,
+                Status = Status.Pending
+            };
 
             await _unitOfWork.Repository<HelpRequest, int>().AddAsync(helpRequest);
             await _unitOfWork.SaveChangesAsync();
+
+            return helpRequest;
         }
 
-        public async Task UpdateAsync(HelpRequest helpRequest)
+        public async Task<IEnumerable<HelpRequest>> GetPendingHelpRequestsAsync()
         {
-            var guest = await _unitOfWork.Repository<Guest, string>().GetByIdAsync(helpRequest.PhoneNumber);
-            if (guest == null)
+            return await _unitOfWork.Repository<HelpRequest, int>()
+                .FindAsync(hr => hr.Status == Status.Pending);
+        }
+
+        public async Task ConfirmHelpRequestAsync(int helpRequestId)
+        {
+            var helpRequest = await _unitOfWork.Repository<HelpRequest, int>()
+                .GetAsync(hr => hr.Id == helpRequestId);
+
+            if (helpRequest == null)
             {
-                throw new InvalidOperationException($"Guest with ID {helpRequest.PhoneNumber} not found.");
+                throw new Exception("Help request not found.");
             }
 
+            helpRequest.Status = Status.Done;
             _unitOfWork.Repository<HelpRequest, int>().Update(helpRequest);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task CancelHelpRequestAsync(int helpRequestId)
         {
-            var helpRequest = await _unitOfWork.Repository<HelpRequest, int>().GetByIdAsync(id);
+            var helpRequest = await _unitOfWork.Repository<HelpRequest, int>()
+                .GetAsync(hr => hr.Id == helpRequestId);
+
             if (helpRequest == null)
             {
-                throw new InvalidOperationException($"HelpRequest with ID {id} not found.");
+                throw new Exception("Help request not found.");
             }
 
-            _unitOfWork.Repository<HelpRequest, int>().Delete(helpRequest);
+            helpRequest.Status = Status.Canceled;
+            _unitOfWork.Repository<HelpRequest, int>().Update(helpRequest);
             await _unitOfWork.SaveChangesAsync();
         }
     }

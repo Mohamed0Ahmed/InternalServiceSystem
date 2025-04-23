@@ -4,8 +4,8 @@ namespace System.Domain.Entities
 {
     public class Customer : BaseEntity<int>
     {
-        public required string PhoneNumber { get; set; }
+        public  string PhoneNumber { get; set; } = string.Empty;
         public int StoreId { get; set; }
-        public required Store Store { get; set; }
+        public  Store? Store { get; set; } 
     }
 }

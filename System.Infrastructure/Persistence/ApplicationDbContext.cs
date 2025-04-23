@@ -12,6 +12,7 @@ namespace System.Infrastructure.Persistence
         }
 
         public DbSet<Store> Stores { get; set; }
+        public DbSet<Customer>Customers  { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Guest> Guests { get; set; }
@@ -21,7 +22,6 @@ namespace System.Infrastructure.Persistence
         public DbSet<HelpRequest> HelpRequests { get; set; }
         public DbSet<PointsSetting> PointsSettings { get; set; }
         public DbSet<CustomerPoints> CustomerPoints { get; set; }
-        public DbSet<Customer> Customers { get; set; }
         public DbSet<Reward> Rewards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

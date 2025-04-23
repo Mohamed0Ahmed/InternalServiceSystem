@@ -10,6 +10,17 @@ namespace System.Infrastructure.Persistence.Configurations
         {
             base.Configure(builder);
 
+            builder.Property(g => g.Username)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(g => g.Password)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(g => g.PhoneNumber)
+                .IsRequired();
+
             builder.HasOne(g => g.Store)
                 .WithMany()
                 .HasForeignKey(g => g.StoreId)
@@ -24,6 +35,9 @@ namespace System.Infrastructure.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(g => g.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(g => g.Username)
+                .IsUnique();
         }
     }
 }

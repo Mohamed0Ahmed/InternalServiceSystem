@@ -11,8 +11,8 @@ namespace System.Domain.Entities
         public string Details { get; set; } = string.Empty;
         public DateTime RequestDate { get; set; }
         public Status Status { get; set; }
-        public required Customer Customer { get; set; }
-        public required Guest Guest { get; set; }
-        public required Room Room { get; set; }
+        public  Customer Customer { get; set; }
+        public  Guest Guest { get; set; }
+        public  Room Room { get; set; }
     }
 }

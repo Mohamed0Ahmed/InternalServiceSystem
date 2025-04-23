@@ -7,82 +7,108 @@ namespace System.Application.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRoomService _roomService;
+        private readonly ICustomerPointsService _customerPointsService;
 
-        public OrderService(IUnitOfWork unitOfWork, IRoomService roomService)
+        public OrderService(IUnitOfWork unitOfWork, ICustomerPointsService customerPointsService)
         {
             _unitOfWork = unitOfWork;
-            _roomService = roomService;
+            _customerPointsService = customerPointsService;
         }
 
-        public async Task<Order> GetByIdAsync(int id)
+        public async Task<Order> CreateOrderAsync(int customerId, string guestId, int roomId, List<(int ProductId, int Quantity)> orderItems)
         {
-            return await _unitOfWork.Repository<Order,int>().GetByIdAsync(id);
-        }
-
-        public async Task<IEnumerable<Order>> GetAllAsync()
-        {
-            return await _unitOfWork.Repository<Order, int>().GetAllAsync();
-        }
-
-        public async Task<IEnumerable<Order>> GetByGuestIdAsync(string guestId)
-        {
-            return await _unitOfWork.Repository<Order, int>().FindAsync(o => o.PhoneNumber == guestId);
-        }
-
-        public async Task AddAsync(Order order, IEnumerable<OrderItem> orderItems)
-        {
-            var guest = await _unitOfWork.Repository<Guest, string>().GetByIdAsync(order.PhoneNumber);
-            if (guest == null)
+            var order = new Order
             {
-                throw new InvalidOperationException($"Guest with ID {order.PhoneNumber} not found.");
-            }
+                CustomerId = customerId,
+                GuestId = guestId,
+                RoomId = roomId,
+                OrderDate = DateTime.UtcNow,
+                Status = Status.Pending,
+                OrderItems = []
+            };
 
-            if (!await _roomService.CheckAvailabilityAsync(order.RoomId))
-            {
-                throw new InvalidOperationException($"Room with ID {order.RoomId} is not available.");
-            }
-
-            //order.totalPrice = await CalculateTotalPriceAsync(orderItems);
-
-
-
-            await _unitOfWork.Repository<Order, int>().AddAsync(order);
+            decimal totalPrice = 0;
             foreach (var item in orderItems)
             {
-                item.OrderId = order.Id;
-                await _unitOfWork.Repository<OrderItem, int>().AddAsync(item);
+                var product = await _unitOfWork.Repository<Product, int>()
+                    .GetAsync(p => p.Id == item.ProductId);
+
+                if (product == null)
+                {
+                    throw new Exception($"Product with ID {item.ProductId} not found.");
+                }
+
+                var orderItem = new OrderItem
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = product.Price
+                };
+
+                order.OrderItems.Add(orderItem);
+                totalPrice += product.Price * item.Quantity;
             }
+
+            order.TotalPriceAtOrderTime = totalPrice;
+
+            await _unitOfWork.Repository<Order, int>().AddAsync(order);
+            await _unitOfWork.SaveChangesAsync();
+
+            return order;
+        }
+
+        public async Task<IEnumerable<Order>> GetPendingOrdersAsync()
+        {
+            return await _unitOfWork.Repository<Order, int>()
+                .FindAsync(o => o.Status == Status.Pending);
+        }
+
+        public async Task ConfirmOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.Repository<Order, int>()
+                .GetAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                throw new Exception("Order not found.");
+            }
+
+            order.Status = Status.Done;
+            _unitOfWork.Repository<Order, int>().Update(order);
+
+            var room = await _unitOfWork.Repository<Room, int>()
+                .GetAsync(r => r.Id == order.RoomId);
+            var pointsSetting = await _unitOfWork.Repository<PointsSetting, int>()
+                .GetAsync(ps => ps.BranchId == room.BranchId);
+
+            if (pointsSetting != null)
+            {
+                int points = (int)(order.TotalPriceAtOrderTime / pointsSetting.AmountPerPoint) * pointsSetting.PointsValue;
+                await _customerPointsService.UpdatePointsAsync(order.CustomerId, room.BranchId, points);
+            }
+
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Order order)
+        public async Task CancelOrderAsync(int orderId)
         {
-            var guest = await _unitOfWork.Repository<Guest,string>().GetByIdAsync(order.PhoneNumber);
-            if (guest == null)
+            var order = await _unitOfWork.Repository<Order, int>()
+                .GetAsync(o => o.Id == orderId);
+
+            if (order == null)
             {
-                throw new InvalidOperationException($"Guest with ID {order.PhoneNumber} not found.");
+                throw new Exception("Order not found.");
             }
 
+            order.Status = Status.Canceled;
             _unitOfWork.Repository<Order, int>().Update(order);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<IEnumerable<Order>> GetOrdersByCustomerAsync(int customerId)
         {
-            var order = await _unitOfWork.Repository<Order, int>().GetByIdAsync(id);
-            if (order == null)
-            {
-                throw new InvalidOperationException($"Order with ID {id} not found.");
-            }
-
-            _unitOfWork.Repository<Order, int>().Delete(order);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task<decimal> CalculateTotalPriceAsync(IEnumerable<OrderItem> orderItems)
-        {
-            return await Task.FromResult(orderItems.Sum(item => item.Quantity * item.UnitPrice));
+            return await _unitOfWork.Repository<Order, int>()
+                .FindAsync(o => o.CustomerId == customerId);
         }
     }
 }

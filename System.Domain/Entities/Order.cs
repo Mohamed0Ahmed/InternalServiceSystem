@@ -10,10 +10,10 @@ namespace System.Domain.Entities
         public decimal TotalPriceAtOrderTime { get; set; }
         public DateTime OrderDate { get; set; }
         public Status Status { get; set; }
-        public required Customer Customer { get; set; }
-        public required Guest Guest { get; set; }
-        public required Room Room { get; set; }
-        public required List<OrderItem> OrderItems { get; set; }
+        public  Customer Customer { get; set; }
+        public  Guest Guest { get; set; }
+        public  Room Room { get; set; }
+        public  List<OrderItem> OrderItems { get; set; }
     }
 
     public enum Status

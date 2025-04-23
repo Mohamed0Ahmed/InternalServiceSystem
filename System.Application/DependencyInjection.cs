@@ -9,18 +9,16 @@ namespace System.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
-           
 
-            services.AddScoped<IStoreService, StoreService>();
-            services.AddScoped<IBranchService, BranchService>();
-            services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IGuestService, GuestService>();
-            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IOrderItemService, OrderItemService>();
             services.AddScoped<IHelpRequestService, HelpRequestService>();
-            services.AddScoped<IPointsSettingService, PointsSettingService>();
-            services.AddScoped<IGuestPointsService, GuestPointsService>();
+            services.AddScoped<ICustomerPointsService, CustomerPointsService>();
+            services.AddScoped<IRewardService, RewardService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IRoomService, RoomService>();
+
 
             return services;
         }

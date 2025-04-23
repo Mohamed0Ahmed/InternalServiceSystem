@@ -5,8 +5,8 @@ namespace System.Domain.Entities
     public class Reward : BaseEntity<int>
     {
         public int BranchId { get; set; }
-        public required string Name { get; set; }
+        public  string Name { get; set; } = string.Empty;
         public int RequiredPoints { get; set; }
-        public required Branch Branch { get; set; }
+        public  Branch Branch { get; set; }
     }
 }
