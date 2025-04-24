@@ -39,7 +39,7 @@ namespace MvcProject.Controllers
             var points = await _customerPointsService.GetPointsAsync(customer.Id, guest.BranchId);
             ViewBag.Points = points.Points;
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("GetProducts", "Product");
         }
     }
 }

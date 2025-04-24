@@ -21,7 +21,7 @@ namespace MvcProject.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize(Roles = "Guest,Customer")]
+        //[Authorize(Roles = "Guest,Customer")]
         public async Task<IActionResult> GetProducts(int branchId)
         {
             var products = await _productService.GetProductsByBranchAsync(branchId);

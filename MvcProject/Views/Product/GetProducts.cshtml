@@ -1,0 +1,33 @@
+﻿@model List<System.Domain.Entities.Product>
+
+@{
+    ViewData["Title"] = "Order Products";
+}
+
+<h2 class="text-center mb-4">Order Products</h2>
+
+<form asp-controller="Order" asp-action="CreateOrder" method="post">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>@Model[i].Name</td>
+                    <td>@Model[i].Price</td>
+                    <td>
+                        <input type="hidden" name="orderItems[@i].ProductId" value="@Model[i].Id" />
+                        <input type="number" name="orderItems[@i].Quantity" min="0" value="0" class="form-control w-25 d-inline" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Submit Order</button>
+</form>

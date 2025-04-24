@@ -1,0 +1,43 @@
+﻿@model List<System.Domain.Entities.HelpRequest>
+
+@{
+    ViewData["Title"] = "Pending Help Requests";
+}
+
+<h2 class="text-center mb-4">Pending Help Requests</h2>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Customer Phone</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var request in Model)
+            {
+                <tr>
+                    <td>@request.Id</td>
+                    <td>@request.Customer.PhoneNumber</td>
+                    <td>@request.RequestType</td>
+                    <td>@request.Details</td>
+                    <td>
+                        <a asp-action="ConfirmHelpRequest" asp-route-id="@request.Id" class="btn btn-success btn-sm">Confirm</a>
+                        <a asp-action="CancelHelpRequest" asp-route-id="@request.Id" class="btn btn-danger btn-sm">Cancel</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        No pending help requests available.
+    </div>
+}

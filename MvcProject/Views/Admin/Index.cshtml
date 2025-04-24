@@ -1,0 +1,385 @@
+﻿@model List<System.Domain.Entities.Store>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h2 class="text-center mb-4">Admin Dashboard</h2>
+
+<!-- Stores Table -->
+<div class="mb-4">
+    <h4>Stores</h4>
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createStoreModal">Add New Store</button>
+    <table id="storesTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var store in Model)
+            {
+                <tr data-store-id="@store.Id">
+                    <td>@store.Id</td>
+                    <td>@store.StoreName</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm view-branches-btn" data-store-id="@store.Id">View Branches</button>
+                        <button type="button" class="btn btn-warning btn-sm edit-store-btn" data-store-id="@store.Id" data-store-name="@store.StoreName">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm delete-store-btn" data-store-id="@store.Id">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Owners Section -->
+<div class="mb-4">
+    <h4>Owners</h4>
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createOwnerModal">Add New Owner</button>
+    <table id="ownersTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<!-- Create Store Modal -->
+<div class="modal fade" id="createStoreModal" tabindex="-1" aria-labelledby="createStoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createStoreModalLabel">Add New Store</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createStoreForm">
+                    <div class="mb-3">
+                        <label for="storeName" class="form-label">Store Name</label>
+                        <input type="text" class="form-control" id="storeName" name="storeName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Store</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Store Modal -->
+<div class="modal fade" id="editStoreModal" tabindex="-1" aria-labelledby="editStoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStoreModalLabel">Edit Store</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStoreForm">
+                    <input type="hidden" id="editStoreId" name="id" />
+                    <div class="mb-3">
+                        <label for="editStoreName" class="form-label">Store Name</label>
+                        <input type="text" class="form-control" id="editStoreName" name="storeName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Branches Modal -->
+<div class="modal fade" id="branchesModal" tabindex="-1" aria-labelledby="branchesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="branchesModalLabel">Branches</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createBranchModal">Add New Branch</button>
+                <table id="branchesTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Branch Modal -->
+<div class="modal fade" id="createBranchModal" tabindex="-1" aria-labelledby="createBranchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createBranchModalLabel">Add New Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createBranchForm">
+                    <input type="hidden" id="createBranchStoreId" name="storeId" />
+                    <div class="mb-3">
+                        <label for="branchName" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="branchName" name="branchName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Branch</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Branch Modal -->
+<div class="modal fade" id="editBranchModal" tabindex="-1" aria-labelledby="editBranchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBranchModalLabel">Edit Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBranchForm">
+                    <input type="hidden" id="editBranchId" name="id" />
+                    <div class="mb-3">
+                        <label for="editBranchName" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="editBranchName" name="branchName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rooms Modal -->
+<div class="modal fade" id="roomsModal" tabindex="-1" aria-labelledby="roomsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="roomsModalLabel">Rooms</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createRoomModal">Add New Room</button>
+                <table id="roomsTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Room Modal -->
+<div class="modal fade" id="createRoomModal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createRoomModalLabel">Add New Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createRoomForm">
+                    <input type="hidden" id="createRoomBranchId" name="branchId" />
+                    <div class="mb-3">
+                        <label for="roomName" class="form-label">Room Name</label>
+                        <input type="text" class="form-control" id="roomName" name="roomName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Room Modal -->
+<div class="modal fade" id="editRoomModal" tabindex="-1" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRoomModalLabel">Edit Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRoomForm">
+                    <input type="hidden" id="editRoomId" name="id" />
+                    <div class="mb-3">
+                        <label for="editRoomName" class="form-label">Room Name</label>
+                        <input type="text" class="form-control" id="editRoomName" name="roomName" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guests Modal -->
+<div class="modal fade" id="guestsModal" tabindex="-1" aria-labelledby="guestsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guestsModalLabel">Guests</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createGuestModal">Add New Guest</button>
+                <table id="guestsTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Phone Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Guest Modal -->
+<div class="modal fade" id="createGuestModal" tabindex="-1" aria-labelledby="createGuestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGuestModalLabel">Add New Guest</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createGuestForm">
+                    <input type="hidden" id="createGuestStoreId" name="storeId" />
+                    <input type="hidden" id="createGuestBranchId" name="branchId" />
+                    <input type="hidden" id="createGuestRoomId" name="roomId" />
+                    <div class="mb-3">
+                        <label for="guestUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="guestUsername" name="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="guestPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="guestPassword" name="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="guestPhoneNumber" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="guestPhoneNumber" name="phoneNumber" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Guest</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Guest Modal -->
+<div class="modal fade" id="editGuestModal" tabindex="-1" aria-labelledby="editGuestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGuestModalLabel">Edit Guest</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editGuestForm">
+                    <input type="hidden" id="editGuestId" name="id" />
+                    <div class="mb-3">
+                        <label for="editGuestUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editGuestUsername" name="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGuestPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="editGuestPassword" name="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editGuestPhoneNumber" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="editGuestPhoneNumber" name="phoneNumber" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Owner Modal -->
+<div class="modal fade" id="createOwnerModal" tabindex="-1" aria-labelledby="createOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createOwnerModalLabel">Add New Owner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createOwnerForm">
+                    <div class="mb-3">
+                        <label for="ownerUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="ownerUsername" name="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="ownerPassword" name="password" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="ownerEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="ownerEmail" name="email" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Owner</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Owner Modal -->
+<div class="modal fade" id="editOwnerModal" tabindex="-1" aria-labelledby="editOwnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOwnerModalLabel">Edit Owner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOwnerForm">
+                    <input type="hidden" id="editOwnerId" name="id" />
+                    <div class="mb-3">
+                        <label for="editOwnerUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="editOwnerUsername" name="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editOwnerEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editOwnerEmail" name="email" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/adminDashboard.js" asp-append-version="true"></script>
+}

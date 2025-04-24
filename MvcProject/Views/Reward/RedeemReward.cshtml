@@ -1,0 +1,40 @@
+﻿@model List<System.Domain.Entities.Reward>
+
+@{
+    ViewData["Title"] = "Redeem Rewards";
+}
+
+<h2 class="text-center mb-4">Redeem Rewards</h2>
+
+<p class="alert alert-info">You have @ViewBag.Points points.</p>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Required Points</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reward in Model)
+            {
+                <tr>
+                    <td>@reward.Name</td>
+                    <td>@reward.RequiredPoints</td>
+                    <td>
+                        <a asp-action="RedeemReward" asp-route-rewardId="@reward.Id" class="btn btn-primary btn-sm">Redeem</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        No rewards available.
+    </div>
+}
