@@ -2,6 +2,13 @@
 
 namespace System.Domain.Entities
 {
+    public enum HelpRequestStatus
+    {
+        Pending,
+        Confirmed,
+        Cancelled
+    }
+
     public class HelpRequest : BaseEntity<int>
     {
         public int CustomerId { get; set; }
@@ -9,10 +16,9 @@ namespace System.Domain.Entities
         public int RoomId { get; set; }
         public string RequestType { get; set; } = string.Empty;
         public string Details { get; set; } = string.Empty;
-        public DateTime RequestDate { get; set; }
-        public Status Status { get; set; }
-        public  Customer Customer { get; set; }
-        public  Guest Guest { get; set; }
-        public  Room Room { get; set; }
+        public HelpRequestStatus Status { get; set; }
+        public Customer Customer { get; set; }
+        public Guest Guest { get; set; }
+        public Room Room { get; set; }
     }
 }
