@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Identity;
 using System.Application.Abstraction;
 using System.Infrastructure;
 using System.Application;
+using System.Infrastructure.Services;
 using System.Infrastructure.Persistence;
 using System.Infrastructure.UnitOfWorks;
+using System.Infrastructure.Abstraction;
+using System.Infrastructure.Persistence.Identity;
 
 namespace MvcProject
 {
@@ -20,15 +23,18 @@ namespace MvcProject
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddApplicationServices(builder.Configuration);
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 6;
-            }).AddEntityFrameworkStores<ApplicationDbContext>()
-              .AddDefaultTokenProviders();
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IIdentityService, IdentityService>();
 
             builder.Services.AddSession(options =>
             {
@@ -42,6 +48,8 @@ namespace MvcProject
             #endregion
 
             var app = builder.Build();
+
+
 
             if (!app.Environment.IsDevelopment())
             {
@@ -64,6 +72,10 @@ namespace MvcProject
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
             app.MapHub<NotificationHub>("/notificationHub");
 

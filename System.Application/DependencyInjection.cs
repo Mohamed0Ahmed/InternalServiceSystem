@@ -18,6 +18,7 @@ namespace System.Application
             services.AddScoped<IRewardService, RewardService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IAdminService, AdminService>();
 
 
             return services;
