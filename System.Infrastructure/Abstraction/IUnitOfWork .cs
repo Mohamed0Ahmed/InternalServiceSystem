@@ -4,7 +4,7 @@ namespace System.Application.Abstraction
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<T, TKey> Repository<T, TKey>()
+        IRepository<T, TKey> Repository<T, TKey>()
                              where T : BaseEntity<TKey>
                              where TKey : IEquatable<TKey>;
         Task<int> SaveChangesAsync();

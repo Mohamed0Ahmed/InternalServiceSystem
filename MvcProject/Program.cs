@@ -7,6 +7,7 @@ using System.Infrastructure.Persistence;
 using System.Infrastructure.UnitOfWorks;
 using System.Infrastructure.Abstraction;
 using System.Infrastructure.Persistence.Identity;
+using System.Infrastructure.GenericRepositories;
 
 namespace MvcProject
 {
@@ -19,6 +20,10 @@ namespace MvcProject
             #region Services
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+
+
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllersWithViews();
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddApplicationServices(builder.Configuration);

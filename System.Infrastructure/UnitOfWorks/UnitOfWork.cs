@@ -1,37 +1,60 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Application.Abstraction;
 using System.Infrastructure.GenericRepositories;
 using System.Infrastructure.Persistence;
+using System.Security.Claims;
 using System.Shared.BaseModel;
 
 namespace System.Infrastructure.UnitOfWorks
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DbContext _context;
-        private readonly Dictionary<Type, object> _repositories = new();
+        private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly Dictionary<Type, object> _repositories = [];
         private IDbContextTransaction? _transaction;
         private bool _disposed;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public IGenericRepository<T, TKey> Repository<T, TKey>() where T : BaseEntity<TKey> where TKey : IEquatable<TKey>
+        public IRepository<T, TKey> Repository<T, TKey>() where T : BaseEntity<TKey> where TKey : IEquatable<TKey>
         {
             var type = typeof(T);
             if (!_repositories.ContainsKey(type))
             {
-                var repo = new GenericRepository<T, TKey>(_context);
+                var repo = new Repository<T, TKey>(_context, _httpContextAccessor);
                 _repositories[type] = repo;
             }
 
-            return (IGenericRepository<T, TKey>)_repositories[type];
+            return (IRepository<T, TKey>)_repositories[type];
         }
 
-        public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
+        public async Task<int> SaveChangesAsync()
+        {
+            var entries = _context.ChangeTracker.Entries<IEntity>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedOn = DateTime.UtcNow;
+                    entry.Entity.CreatedBy = userId;
+                }
+                entry.Entity.LastModifiedOn = DateTime.UtcNow;
+                entry.Entity.LastModifiedBy = userId;
+            }
+
+            return await _context.SaveChangesAsync();
+        }
 
         public async Task BeginTransactionAsync()
         {

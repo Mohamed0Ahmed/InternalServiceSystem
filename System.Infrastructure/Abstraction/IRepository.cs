@@ -3,7 +3,7 @@ using System.Shared.BaseModel;
 
 namespace System.Application.Abstraction
 {
-    public interface IGenericRepository<T, TKey> where T : BaseEntity<TKey> where TKey : IEquatable<TKey>
+    public interface IRepository<T, TKey> where T : BaseEntity<TKey> where TKey : IEquatable<TKey>
     {
         Task<T?> GetByIdAsync(TKey id);
         Task<IEnumerable<T>> GetAllAsync();

@@ -1,102 +1,109 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Application.Abstraction;
+using System.Infrastructure.Persistence;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Shared.BaseModel;
 
 namespace System.Infrastructure.GenericRepositories
 {
-    public class GenericRepository<T, TKey> : IGenericRepository<T, TKey>
-                                    where T : BaseEntity<TKey>
-                                    where TKey : IEquatable<TKey>
+    public class Repository<T, TKey> : IRepository<T, TKey> where T : BaseEntity<TKey> where TKey : IEquatable<TKey>
     {
-        protected readonly DbContext _context;
-        protected readonly DbSet<T> _dbSet;
+        private readonly ApplicationDbContext _context;
+        private readonly DbSet<T> _dbSet;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GenericRepository(DbContext context)
+        public Repository(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _dbSet = context.Set<T>();
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private string? GetCurrentUserId()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         public async Task<T?> GetByIdAsync(TKey id)
         {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity != null && entity.IsDeleted)
-            {
-                return null;
-            }
-            return entity;
+            return await _dbSet.FindAsync(id);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet
-                .Where(e => !e.IsDeleted)
-                .ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<IEnumerable<T>> FindAllAsync(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
+
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query
-                .Where(e => !e.IsDeleted)
-                .ToListAsync();
+
+            return await query.ToListAsync();
         }
 
         public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
+
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query
-                .Where(e => !e.IsDeleted)
-                .FirstOrDefaultAsync(predicate);
+
+            return await query.FirstOrDefaultAsync(predicate);
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
+
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
-            return await query
-                .Where(e => !e.IsDeleted)
-                .Where(predicate)
-                .ToListAsync();
+
+            return await query.Where(predicate).ToListAsync();
         }
 
         public async Task AddAsync(T entity)
         {
+            entity.CreatedOn = DateTime.UtcNow;
+            entity.LastModifiedOn = DateTime.UtcNow;
+            entity.CreatedBy = GetCurrentUserId();
+            entity.LastModifiedBy = GetCurrentUserId();
             await _dbSet.AddAsync(entity);
         }
 
         public void Update(T entity)
         {
+            entity.LastModifiedOn = DateTime.UtcNow;
+            entity.LastModifiedBy = GetCurrentUserId();
             _dbSet.Update(entity);
         }
 
         public void Delete(T entity)
         {
-            entity.IsDeleted = true;
-            entity.DeletedOn = DateTime.UtcNow;
-            _dbSet.Update(entity);
+            _dbSet.Remove(entity);
         }
 
         public async Task SoftDeleteAsync(TKey id)
         {
             var entity = await GetByIdAsync(id);
-            if (entity == null)
+            if (entity != null)
             {
-                throw new InvalidOperationException($"Entity with ID {id} not found.");
+                entity.IsDeleted = true;
+                entity.DeletedOn = DateTime.UtcNow;
+                entity.LastModifiedOn = DateTime.UtcNow;
+                entity.LastModifiedBy = GetCurrentUserId();
+                _dbSet.Update(entity);
             }
-            Delete(entity);
         }
 
         public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
