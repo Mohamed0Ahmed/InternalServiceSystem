@@ -4,18 +4,16 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class OrderItemConfiguration : BaseEntityConfiguration<OrderItem, int>
+    public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     {
-        public override void Configure(EntityTypeBuilder<OrderItem> builder)
+        public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
-            base.Configure(builder);
-
             builder.Property(oi => oi.Quantity)
                 .IsRequired();
 
             builder.Property(oi => oi.UnitPrice)
-                .IsRequired()
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
 
             builder.HasOne(oi => oi.Order)
                 .WithMany(o => o.OrderItems)
@@ -23,7 +21,7 @@ namespace System.Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(oi => oi.Product)
-                .WithMany()
+                .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

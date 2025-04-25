@@ -4,27 +4,22 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class CustomerPointsConfiguration : BaseEntityConfiguration<CustomerPoints, int>
+    public class CustomerPointsConfiguration : IEntityTypeConfiguration<CustomerPoints>
     {
-        public override void Configure(EntityTypeBuilder<CustomerPoints> builder)
+        public void Configure(EntityTypeBuilder<CustomerPoints> builder)
         {
-            base.Configure(builder);
-
             builder.Property(cp => cp.Points)
                 .IsRequired();
 
             builder.HasOne(cp => cp.Customer)
-                .WithMany()
+                .WithMany(c => c.CustomerPoints)
                 .HasForeignKey(cp => cp.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(cp => cp.Branch)
-                .WithMany()
+                .WithMany(b => b.CustomerPoints)
                 .HasForeignKey(cp => cp.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasIndex(cp => new { cp.CustomerId, cp.BranchId })
-                .IsUnique();
         }
     }
 }

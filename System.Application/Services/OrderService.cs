@@ -23,7 +23,7 @@ namespace System.Application.Services
                 GuestId = guestId,
                 RoomId = roomId,
                 OrderDate = DateTime.UtcNow,
-                Status = Status.Pending,
+                //Status = Status.Pending,
                 OrderItems = []
             };
 
@@ -49,7 +49,7 @@ namespace System.Application.Services
                 totalPrice += product.Price * item.Quantity;
             }
 
-            order.TotalPriceAtOrderTime = totalPrice;
+            //order.TotalPriceAtOrderTime = totalPrice;
 
             await _unitOfWork.Repository<Order, int>().AddAsync(order);
             await _unitOfWork.SaveChangesAsync();
@@ -60,7 +60,7 @@ namespace System.Application.Services
         public async Task<IEnumerable<Order>> GetPendingOrdersAsync()
         {
             return await _unitOfWork.Repository<Order, int>()
-                .FindAsync(o => o.Status == Status.Pending);
+                .FindAsync(o => o.Status == 0);
         }
 
         public async Task ConfirmOrderAsync(int orderId)
@@ -73,7 +73,7 @@ namespace System.Application.Services
                 throw new Exception("Order not found.");
             }
 
-            order.Status = Status.Done;
+            //order.Status = Status.Done;
             _unitOfWork.Repository<Order, int>().Update(order);
 
             var room = await _unitOfWork.Repository<Room, int>()
@@ -83,8 +83,8 @@ namespace System.Application.Services
 
             if (pointsSetting != null)
             {
-                int points = (int)(order.TotalPriceAtOrderTime / pointsSetting.AmountPerPoint) * pointsSetting.PointsValue;
-                await _customerPointsService.UpdatePointsAsync(order.CustomerId, room.BranchId, points);
+                //int points = (int)(order.TotalPriceAtOrderTime / pointsSetting.AmountPerPoint) * pointsSetting.PointsValue;
+                //await _customerPointsService.UpdatePointsAsync(order.CustomerId, room.BranchId, points);
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -100,7 +100,7 @@ namespace System.Application.Services
                 throw new Exception("Order not found.");
             }
 
-            order.Status = Status.Canceled;
+            order.Status = 0;
             _unitOfWork.Repository<Order, int>().Update(order);
             await _unitOfWork.SaveChangesAsync();
         }

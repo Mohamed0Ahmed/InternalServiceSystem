@@ -11,8 +11,6 @@ namespace System.Infrastructure
         {
 
        
-
-
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("AppContext")));
 

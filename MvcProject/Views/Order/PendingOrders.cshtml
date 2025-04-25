@@ -30,7 +30,7 @@
                             <div>@item.Product.Name - @item.Quantity x @item.UnitPrice</div>
                         }
                     </td>
-                    <td>@order.TotalPriceAtOrderTime</td>
+                    @* <td>@order.TotalPriceAtOrderTime</td> *@
                     <td>
                         <a asp-action="ConfirmOrder" asp-route-id="@order.Id" class="btn btn-success btn-sm">Confirm</a>
                         <a asp-action="CancelOrder" asp-route-id="@order.Id" class="btn btn-danger btn-sm">Cancel</a>

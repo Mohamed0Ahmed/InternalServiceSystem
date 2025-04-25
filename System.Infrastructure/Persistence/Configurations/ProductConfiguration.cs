@@ -4,12 +4,10 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class ProductConfiguration : BaseEntityConfiguration<Product, int>
+    public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
-        public override void Configure(EntityTypeBuilder<Product> builder)
+        public void Configure(EntityTypeBuilder<Product> builder)
         {
-            base.Configure(builder);
-
             builder.Property(p => p.Name)
                 .IsRequired();
 
@@ -17,9 +15,16 @@ namespace System.Infrastructure.Persistence.Configurations
                 .HasColumnType("decimal(18,2)");
 
             builder.HasOne(p => p.Branch)
-                .WithMany()
+                .WithMany(b => b.Products)
                 .HasForeignKey(p => p.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(p => p.OrderItems)
+                .WithOne(oi => oi.Product)
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(p => p.BranchId);
         }
     }
 }

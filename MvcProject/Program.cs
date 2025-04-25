@@ -21,6 +21,7 @@ namespace MvcProject
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 
             builder.Services.AddHttpContextAccessor();
@@ -28,7 +29,7 @@ namespace MvcProject
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddApplicationServices(builder.Configuration);
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            builder.Services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
@@ -39,7 +40,6 @@ namespace MvcProject
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-            builder.Services.AddScoped<IIdentityService, IdentityService>();
 
             builder.Services.AddSession(options =>
             {

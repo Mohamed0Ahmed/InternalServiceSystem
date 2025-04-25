@@ -22,8 +22,6 @@ namespace System.Application.Services
                 RoomId = roomId,
                 RequestType = requestType,
                 Details = details,
-                RequestDate = DateTime.UtcNow,
-                Status = Status.Pending
             };
 
             await _unitOfWork.Repository<HelpRequest, int>().AddAsync(helpRequest);
@@ -35,7 +33,7 @@ namespace System.Application.Services
         public async Task<IEnumerable<HelpRequest>> GetPendingHelpRequestsAsync()
         {
             return await _unitOfWork.Repository<HelpRequest, int>()
-                .FindAsync(hr => hr.Status == Status.Pending);
+                .FindAsync(hr => hr.Status == 0);
         }
 
         public async Task ConfirmHelpRequestAsync(int helpRequestId)
@@ -48,7 +46,7 @@ namespace System.Application.Services
                 throw new Exception("Help request not found.");
             }
 
-            helpRequest.Status = Status.Done;
+            helpRequest.Status = 0;
             _unitOfWork.Repository<HelpRequest, int>().Update(helpRequest);
             await _unitOfWork.SaveChangesAsync();
         }
@@ -63,7 +61,6 @@ namespace System.Application.Services
                 throw new Exception("Help request not found.");
             }
 
-            helpRequest.Status = Status.Canceled;
             _unitOfWork.Repository<HelpRequest, int>().Update(helpRequest);
             await _unitOfWork.SaveChangesAsync();
         }

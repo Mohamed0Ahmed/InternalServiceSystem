@@ -4,21 +4,19 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class PointsSettingConfiguration : BaseEntityConfiguration<PointsSetting, int>
+    public class PointsSettingConfiguration : IEntityTypeConfiguration<PointsSetting>
     {
-        public override void Configure(EntityTypeBuilder<PointsSetting> builder)
+        public void Configure(EntityTypeBuilder<PointsSetting> builder)
         {
-            base.Configure(builder);
+            builder.Property(ps => ps.PointsPerUnit)
+                .IsRequired();
 
-            builder.Property(ps => ps.AmountPerPoint)
-                .IsRequired()
-                .HasColumnType("decimal(18,2)");
-
-            builder.Property(ps => ps.PointsValue)
+            builder.Property(ps => ps.UnitPrice)
+                .HasColumnType("decimal(18,2)")
                 .IsRequired();
 
             builder.HasOne(ps => ps.Branch)
-                .WithMany()
+                .WithMany(b => b.PointsSettings)
                 .HasForeignKey(ps => ps.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

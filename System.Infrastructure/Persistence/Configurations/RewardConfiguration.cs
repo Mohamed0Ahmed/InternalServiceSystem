@@ -4,12 +4,10 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class RewardConfiguration : BaseEntityConfiguration<Reward, int>
+    public class RewardConfiguration : IEntityTypeConfiguration<Reward>
     {
-        public override void Configure(EntityTypeBuilder<Reward> builder)
+        public void Configure(EntityTypeBuilder<Reward> builder)
         {
-            base.Configure(builder);
-
             builder.Property(r => r.Name)
                 .IsRequired();
 
@@ -17,7 +15,7 @@ namespace System.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.HasOne(r => r.Branch)
-                .WithMany()
+                .WithMany(b => b.Rewards)
                 .HasForeignKey(r => r.BranchId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

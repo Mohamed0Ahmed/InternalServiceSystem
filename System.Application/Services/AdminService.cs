@@ -48,7 +48,7 @@ namespace System.Application.Services
             if (string.IsNullOrWhiteSpace(storeName))
                 return false;
 
-            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s=>s.Id == id);
+            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s => s.Id == id);
             if (store == null || store.IsDeleted || store.IsHidden)
                 return false;
 
@@ -59,7 +59,7 @@ namespace System.Application.Services
 
         public async Task<bool> DeleteStoreAsync(int id)
         {
-            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s=>s.Id== id);
+            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s => s.Id == id);
             if (store == null || store.IsDeleted || store.IsHidden)
                 return false;
 
@@ -90,7 +90,7 @@ namespace System.Application.Services
             if (string.IsNullOrWhiteSpace(branchName))
                 return false;
 
-            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s=>s.Id == storeId);
+            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s => s.Id == storeId);
             if (store == null || store.IsDeleted || store.IsHidden)
                 return false;
 
@@ -199,11 +199,11 @@ namespace System.Application.Services
             if (room == null || room.IsDeleted || room.IsHidden)
                 return false;
 
-            var branch = await _unitOfWork.Repository<Branch, int>().GetAsync(b=>b.Id==branchId);
+            var branch = await _unitOfWork.Repository<Branch, int>().GetAsync(b => b.Id == branchId);
             if (branch == null || branch.IsDeleted || branch.IsHidden || branch.Id != room.BranchId)
                 return false;
 
-            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s=>s.Id==storeId);
+            var store = await _unitOfWork.Repository<Store, int>().GetAsync(s => s.Id == storeId);
             if (store == null || store.IsDeleted || store.IsHidden || store.Id != branch.StoreId)
                 return false;
 
@@ -216,7 +216,6 @@ namespace System.Application.Services
                 RoomId = roomId,
                 Username = username,
                 Password = password,
-                PhoneNumber = phoneNumber,
                 IsDeleted = false,
                 IsHidden = false
             };
@@ -230,14 +229,13 @@ namespace System.Application.Services
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(phoneNumber))
                 return false;
 
-            var guest = await _unitOfWork.Repository<Guest, string>().GetAsync(g=>g.Id == id);
+            var guest = await _unitOfWork.Repository<Guest, string>().GetAsync(g => g.Id == id);
             if (guest == null || guest.IsDeleted || guest.IsHidden)
                 return false;
 
             guest.Username = username;
             //guest.Password = BCrypt.Net.BCrypt.HashPassword(password);
             guest.Password = password;
-            guest.PhoneNumber = phoneNumber;
 
             _unitOfWork.Repository<Guest, string>().Update(guest);
             return await _unitOfWork.SaveChangesAsync() > 0;
@@ -245,7 +243,7 @@ namespace System.Application.Services
 
         public async Task<bool> DeleteGuestAsync(string id)
         {
-            var guest = await _unitOfWork.Repository<Guest, string>().GetAsync(g=>g.Id == id);
+            var guest = await _unitOfWork.Repository<Guest, string>().GetAsync(g => g.Id == id);
             if (guest == null || guest.IsDeleted || guest.IsHidden)
                 return false;
 
@@ -289,6 +287,6 @@ namespace System.Application.Services
             await _identityService.LogoutAsync();
         }
 
-     
+
     }
 }

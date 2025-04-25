@@ -4,33 +4,35 @@ using System.Domain.Entities;
 
 namespace System.Infrastructure.Persistence.Configurations
 {
-    public class OrderConfiguration : BaseEntityConfiguration<Order, int>
+    public class OrderConfiguration : IEntityTypeConfiguration<Order>
     {
-        public override void Configure(EntityTypeBuilder<Order> builder)
+        public void Configure(EntityTypeBuilder<Order> builder)
         {
-            base.Configure(builder);
-
-            builder.Property(o => o.TotalPriceAtOrderTime)
-                .IsRequired()
-                .HasColumnType("decimal(18,2)");
-
-            builder.Property(o => o.Status)
+            builder.Property(o => o.OrderDate)
                 .IsRequired();
 
+            builder.Property(o => o.TotalPrice)
+                .HasColumnType("decimal(18,2)");
+
             builder.HasOne(o => o.Customer)
-                .WithMany()
+                .WithMany(c => c.Orders)
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.Guest)
-                .WithMany()
+                .WithMany(g => g.Orders)
                 .HasForeignKey(o => o.GuestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.Room)
-                .WithMany()
+                .WithMany(r => r.Orders)
                 .HasForeignKey(o => o.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
